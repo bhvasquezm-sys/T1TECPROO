@@ -40,6 +40,23 @@ public class Pedido {
         this.platos = platos;
     }
 
+    // Validaciones
+    private boolean validarPlato(String nombre, double precio, int cantidad) {
+        if (nombre == null || nombre.trim().isEmpty()) {
+            System.out.println("Error: El nombre es vacío.");
+            return false;
+        }
+        if (precio <= 0) {
+            System.out.println("Error: El precio debe ser mayor que 0.");
+            return false;
+        }
+        if (cantidad <= 0) {
+            System.out.println("Error: La cantidad debe ser mayor que 0.");
+            return false;
+        }
+        return true;
+    }
+
     // Buscar si un plato ya existe
     public Plato buscarPlato(String nombre) {
         for (Plato p : platos) {
@@ -50,11 +67,22 @@ public class Pedido {
         return null;
     }
 
-    public void agregarPlato(String nombre, double precio, int cantidad) {
+    public boolean agregarPlato(String nombre, double precio, int cantidad) {
+        if (!validarPlato(nombre, precio, cantidad)) {
+            return false;
+        }
+        if (buscarPlato(nombre) != null) {
+            System.out.println("Error: ese plato ya está en el pedido.");
+            return false;
+        }
         platos.add(new Plato(nombre, precio, cantidad));
+        return true;
     }
 
     public double calcularTotal() {
+        if (platos.isEmpty()) {
+            throw new IllegalStateException("El pedido está vacío.");
+        }
         double total = 0;
         for (Plato p : platos) {
             total += p.getPrecio() * p.getCantidad();
@@ -89,5 +117,12 @@ public class Pedido {
         pedido.agregarPlato("Refresco", 2.0, 3);
 
         pedido.mostrarResumen();
+
+        System.out.println("Total: " + pedido.calcularTotal());
+
+        pedido.eliminarPlato("Ensalada");
+        pedido.mostrarResumen();
+
+        pedido.agregarPlato("Pizza", 10.5, 1); // Error por duplicado
     }
 }
